@@ -154,6 +154,35 @@ abstract final class LA {
         center: center,
       );
 
+  /// A system-driven progress bar or ring that advances between [start] and
+  /// [end] on the system clock, with no payload updates required.
+  ///
+  /// Prefer [progress] / [circularProgress] when [trackColor] or
+  /// [cornerRadius] theming matters more than tick-free battery life — the
+  /// system style ignores both.
+  static LAProgressViewNative progressNative(
+    DateTime start,
+    DateTime end, {
+    LAProgressViewNativeStyle style = LAProgressViewNativeStyle.linear,
+    bool countsDown = true,
+    Color? tint,
+    String? label,
+    String? currentValueLabel,
+    double? size,
+    double? height,
+  }) =>
+      LAProgressViewNative(
+        start,
+        end,
+        style: style,
+        countsDown: countsDown,
+        tint: tint,
+        label: label,
+        currentValueLabel: currentValueLabel,
+        size: size,
+        height: height,
+      );
+
   /// A value with an optional label, unit and icon — for stat rows.
   static LAMetric metric(
     String value, {

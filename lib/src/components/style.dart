@@ -172,6 +172,22 @@ enum LACountdownStyle {
   }
 }
 
+/// Presentation style for [LAProgressViewNative].
+enum LAProgressViewNativeStyle {
+  /// SwiftUI's default bar style.
+  linear,
+
+  /// A progress ring, drawn with the system's circular style.
+  circular;
+
+  static LAProgressViewNativeStyle? fromName(Object? raw) {
+    for (final v in LAProgressViewNativeStyle.values) {
+      if (v.name == raw) return v;
+    }
+    return null;
+  }
+}
+
 /// Insets used by [LAPadding] and [LAContainer].
 class LAInsets {
   const LAInsets({

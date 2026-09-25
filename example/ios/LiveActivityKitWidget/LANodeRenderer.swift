@@ -37,6 +37,7 @@ public struct LANodeView: View {
         case .column(let n): return AnyView(LAColumnView(node: n))
         case .progress(let n): return AnyView(LAProgressView(node: n))
         case .circularProgress(let n): return AnyView(LACircularProgressView(node: n))
+        case .progressViewNative(let n): return AnyView(LAProgressViewNativeView(node: n))
         case .metric(let n): return AnyView(LAMetricView(node: n))
         case .countdown(let n): return AnyView(LACountdownView(node: n))
         case .spacer(let n): return AnyView(Spacer(minLength: n.minLength))
@@ -204,6 +205,57 @@ struct LACircularProgressView: View {
             }
         }
         .frame(width: node.size, height: node.size)
+    }
+}
+
+// MARK: - progress (system-driven)
+
+@available(iOS 16.1, *)
+struct LAProgressViewNativeView: View {
+    let node: LAProgressViewNativeNode
+
+    var body: some View {
+        Group {
+            switch node.style {
+            case .linear:
+                progressView
+                    .progressViewStyle(.linear)
+                    .frame(height: node.height)
+            case .circular:
+                progressView
+                    .progressViewStyle(.circular)
+                    .frame(width: node.size, height: node.size)
+            }
+        }
+        .tint(node.tint)
+        // Unlike `Text(date, style:)`, ActivityKit's system-rendered
+        // `ProgressView(timerInterval:)` keys its externally-ticked fill to
+        // view *identity*, not to `node.range`'s value. A later `update()`
+        // with a new interval (e.g. auto-progressing into the next work/break
+        // block) is otherwise drawn as if it were still the old, now-elapsed
+        // range — frozen full. Forcing a fresh identity per range makes the
+        // system re-adopt the new interval instead of reusing the stale one.
+        .id(node.start)
+    }
+
+    // `ProgressView(timerInterval:)` is driven by the system clock, exactly
+    // like `Text(date, style:)` in `LACountdownView`: no payload update, no
+    // wake-up, no APNs push while the range elapses.
+    @ViewBuilder
+    private var progressView: some View {
+        if let label = node.label, let currentValueLabel = node.currentValueLabel {
+            ProgressView(timerInterval: node.range, countsDown: node.countsDown) {
+                Text(label)
+            } currentValueLabel: {
+                Text(currentValueLabel)
+            }
+        } else if let label = node.label {
+            ProgressView(timerInterval: node.range, countsDown: node.countsDown) {
+                Text(label)
+            }
+        } else {
+            ProgressView(timerInterval: node.range, countsDown: node.countsDown)
+        }
     }
 }
 

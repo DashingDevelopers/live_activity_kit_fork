@@ -20,6 +20,7 @@ export 'src/components/node.dart'
         LAColumn,
         LAProgress,
         LACircularProgress,
+        LAProgressViewNative,
         LAMetric,
         LACountdown,
         LASpacer,
@@ -27,7 +28,13 @@ export 'src/components/node.dart'
         LAPadding,
         LAContainer;
 export 'src/components/style.dart'
-    show LAAlign, LADistribution, LAImageSource, LACountdownStyle, LAInsets;
+    show
+        LAAlign,
+        LADistribution,
+        LAImageSource,
+        LACountdownStyle,
+        LAProgressViewNativeStyle,
+        LAInsets;
 export 'src/bridge/live_activity_platform.dart'
     show LiveActivityPlatform, MethodChannelLiveActivity;
 export 'src/live_activity.dart';
