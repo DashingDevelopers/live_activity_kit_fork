@@ -62,7 +62,8 @@ struct LATextView: View {
             .multilineTextAlignment(node.alignment?.0 ?? .leading)
             .lineLimit(node.maxLines ?? 1)
             .opacity(node.opacity ?? 1)
-            .frame(maxWidth: .infinity, alignment: node.alignment?.1 ?? .leading)
+            .frame(maxWidth: node.alignment == nil ? nil : .infinity,
+                   alignment: node.alignment?.1 ?? .leading)
     }
 }
 
@@ -261,7 +262,8 @@ struct LACountdownView: View {
         .foregroundColor(node.color)
         .multilineTextAlignment(node.alignment?.0 ?? .leading)
         .lineLimit(1)
-        .frame(maxWidth: .infinity, alignment: node.alignment?.1 ?? .leading)
+        .frame(maxWidth: node.alignment == nil ? nil : .infinity,
+               alignment: node.alignment?.1 ?? .leading)
     }
 }
 
