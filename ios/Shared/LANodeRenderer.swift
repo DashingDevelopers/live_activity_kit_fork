@@ -63,8 +63,7 @@ struct LATextView: View {
             .multilineTextAlignment(node.alignment?.0 ?? .leading)
             .lineLimit(node.maxLines ?? 1)
             .opacity(node.opacity ?? 1)
-            .frame(maxWidth: node.alignment == nil ? nil : .infinity,
-                   alignment: node.alignment?.1 ?? .leading)
+            .frame(maxWidth: .infinity, alignment: node.alignment?.1 ?? .leading)
     }
 }
 
@@ -244,14 +243,42 @@ struct LAProgressViewNativeView: View {
             ProgressView(timerInterval: node.range, countsDown: node.countsDown) {
                 Text(label)
             } currentValueLabel: {
-                Text(currentValueLabel)
+                // The circular style crams this text into a small ring, so it
+                // needs a smaller, monospaced, single-line rendering to avoid
+                // clipping/jitter. The linear style has room and is left
+                // using the system default.
+                if node.style == .circular {
+                    Text(currentValueLabel)
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                } else {
+                    Text(currentValueLabel)
+                }
             }
         } else if let label = node.label {
             ProgressView(timerInterval: node.range, countsDown: node.countsDown) {
                 Text(label)
             }
         } else {
-            ProgressView(timerInterval: node.range, countsDown: node.countsDown)
+            // Supplying our own `currentValueLabel` (rather than relying on
+            // the system-generated one from the plain initializer) gives us
+            // a real `Text` to style; the `Text(timerInterval:countsDown:)`
+            // variant still auto-ticks with no state management required.
+            ProgressView(timerInterval: node.range, countsDown: node.countsDown) {
+                EmptyView()
+            } currentValueLabel: {
+                if node.style == .circular {
+                    Text(timerInterval: node.range, countsDown: node.countsDown)
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
+                } else {
+                    Text(timerInterval: node.range, countsDown: node.countsDown)
+                }
+            }
         }
     }
 }
@@ -314,8 +341,7 @@ struct LACountdownView: View {
         .foregroundColor(node.color)
         .multilineTextAlignment(node.alignment?.0 ?? .leading)
         .lineLimit(1)
-        .frame(maxWidth: node.alignment == nil ? nil : .infinity,
-               alignment: node.alignment?.1 ?? .leading)
+        .frame(maxWidth: .infinity, alignment: node.alignment?.1 ?? .leading)
     }
 }
 
