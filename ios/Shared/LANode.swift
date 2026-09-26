@@ -19,7 +19,6 @@ public indirect enum LANode {
     case column(LAStackNode)
     case progress(LAProgressNode)
     case circularProgress(LACircularProgressNode)
-    case progressViewNative(LAProgressViewNativeNode)
     case metric(LAMetricNode)
     case countdown(LACountdownNode)
     case spacer(LASpacerNode)
@@ -38,7 +37,6 @@ public indirect enum LANode {
         case "column": return .column(LAStackNode(json, isRow: false))
         case "progress": return .progress(LAProgressNode(json))
         case "circularProgress": return .circularProgress(LACircularProgressNode(json))
-        case "progressViewNative": return .progressViewNative(LAProgressViewNativeNode(json))
         case "metric": return .metric(LAMetricNode(json))
         case "countdown": return .countdown(LACountdownNode(json))
         case "spacer": return .spacer(LASpacerNode(json))
@@ -155,45 +153,6 @@ public struct LACircularProgressNode {
         track = LAColor.parse(json["track"])
         center = LANode.parse(json["center"])
     }
-}
-
-public struct LAProgressViewNativeNode {
-    public enum Style: String {
-        case linear, circular
-    }
-
-    /// System-driven counterpart of `LAProgressNode`/`LACircularProgressNode`:
-    /// SwiftUI's `ProgressView(timerInterval:countsDown:)` advances on the
-    /// system clock, so — like `LACountdownNode` — no payload update is needed
-    /// while the range elapses. The trade-off is that the system style ignores
-    /// `track`/`cornerRadius`, unlike the hand-drawn progress nodes.
-    public let start: Date
-    public let end: Date
-    public let style: Style
-    public let countsDown: Bool
-    public let tint: Color?
-    public let label: String?
-    public let currentValueLabel: String?
-    public let size: CGFloat?
-    public let height: CGFloat?
-
-    public init(_ json: [String: Any]) {
-        let rawStart = Date(timeIntervalSince1970: (json["start"] as? Double) ?? 0)
-        let rawEnd = Date(timeIntervalSince1970: (json["end"] as? Double) ?? 0)
-        // `ProgressView(timerInterval:)` requires start <= end; guard against
-        // a malformed payload instead of crashing the extension.
-        start = min(rawStart, rawEnd)
-        end = max(rawStart, rawEnd)
-        style = Style(rawValue: (json["style"] as? String) ?? "") ?? .linear
-        countsDown = (json["countsDown"] as? Bool) ?? true
-        tint = LAColor.parse(json["tint"])
-        label = json["label"] as? String
-        currentValueLabel = json["currentValueLabel"] as? String
-        size = (json["size"] as? Double).map { CGFloat($0) }
-        height = (json["height"] as? Double).map { CGFloat($0) }
-    }
-
-    public var range: ClosedRange<Date> { start...end }
 }
 
 public struct LAMetricNode {

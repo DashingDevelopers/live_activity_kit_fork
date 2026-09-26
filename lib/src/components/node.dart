@@ -56,7 +56,6 @@ abstract class LANode {
     LAColumn.kType: LAColumn.fromJson,
     LAProgress.kType: LAProgress.fromJson,
     LACircularProgress.kType: LACircularProgress.fromJson,
-    LAProgressViewNative.kType: LAProgressViewNative.fromJson,
     LAMetric.kType: LAMetric.fromJson,
     LACountdown.kType: LACountdown.fromJson,
     LASpacer.kType: LASpacer.fromJson,
@@ -445,91 +444,6 @@ class LACircularProgress extends LANode {
         tint: decodeColor(json['tint']),
         trackColor: decodeColor(json['track']),
         center: LANode._child(json['center']),
-      );
-}
-
-/// A system-driven progress bar or ring.
-///
-/// Wraps SwiftUI's `ProgressView(timerInterval:countsDown:)`: like
-/// [LACountdown], it advances from [start] to [end] on the system clock with
-/// **no** payload updates. Trade-off versus [LAProgress] /
-/// [LACircularProgress]: the system style ignores [trackColor] and
-/// [cornerRadius] entirely, so prefer the hand-drawn nodes when that theming
-/// matters more than tick-free battery life.
-class LAProgressViewNative extends LANode {
-  const LAProgressViewNative(
-    this.start,
-    this.end, {
-    this.style = LAProgressViewNativeStyle.linear,
-    this.countsDown = true,
-    this.tint,
-    this.label,
-    this.currentValueLabel,
-    this.size,
-    this.height,
-  });
-
-  static const kType = 'progressViewNative';
-
-  /// The instant the range began — progress is `0` at or before this.
-  final DateTime start;
-
-  /// The instant the range completes — progress is `1` at or after this.
-  final DateTime end;
-  final LAProgressViewNativeStyle style;
-
-  /// Whether the system's default label counts down to [end] rather than up
-  /// from [start]. Purely cosmetic: the fill always tracks elapsed time.
-  final bool countsDown;
-  final Color? tint;
-
-  /// Leading label, e.g. a title. Falls back to the system default when null.
-  final String? label;
-
-  /// Trailing value label, e.g. a remaining-time caption.
-  final String? currentValueLabel;
-
-  /// Diameter, applied only in [LAProgressViewNativeStyle.circular].
-  final double? size;
-
-  /// Track height, applied only in [LAProgressViewNativeStyle.linear].
-  final double? height;
-
-  @override
-  String get type => kType;
-
-  @override
-  void writeProperties(Map<String, Object?> json) {
-    // Seconds since epoch, matching LACountdown's `until`.
-    json['start'] = start.toUtc().millisecondsSinceEpoch / 1000.0;
-    json['end'] = end.toUtc().millisecondsSinceEpoch / 1000.0;
-    if (style != LAProgressViewNativeStyle.linear) json['style'] = style.name;
-    if (!countsDown) json['countsDown'] = false;
-    json['tint'] = encodeColor(tint);
-    json['label'] = label;
-    json['currentValueLabel'] = currentValueLabel;
-    json['size'] = size;
-    json['height'] = height;
-  }
-
-  static LAProgressViewNative fromJson(Map<String, Object?> json) =>
-      LAProgressViewNative(
-        DateTime.fromMillisecondsSinceEpoch(
-          (((json['start'] as num?)?.toDouble() ?? 0) * 1000).round(),
-          isUtc: true,
-        ),
-        DateTime.fromMillisecondsSinceEpoch(
-          (((json['end'] as num?)?.toDouble() ?? 0) * 1000).round(),
-          isUtc: true,
-        ),
-        style: LAProgressViewNativeStyle.fromName(json['style']) ??
-            LAProgressViewNativeStyle.linear,
-        countsDown: json['countsDown'] != false,
-        tint: decodeColor(json['tint']),
-        label: json['label']?.toString(),
-        currentValueLabel: json['currentValueLabel']?.toString(),
-        size: LANode._double(json['size']),
-        height: LANode._double(json['height']),
       );
 }
 

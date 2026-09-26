@@ -80,7 +80,6 @@ void main() {
         LA.column(const []),
         LA.progress(0.5),
         LA.circularProgress(0.5, center: LA.text('50')),
-        LA.progressNative(DateTime.utc(2030), DateTime.utc(2030, 1, 2)),
         LA.metric('1'),
         LA.countdown(DateTime.utc(2030)),
         LA.spacer(minLength: 4),
@@ -137,45 +136,6 @@ void main() {
       final until = DateTime.utc(2030, 5, 6, 7, 8, 9);
       final decoded = LANode.fromJson(LA.countdown(until).toJson()) as LACountdown;
       expect(decoded.until.toUtc(), until);
-    });
-  });
-
-  group('progressNative', () {
-    test('encodes start/end as epoch seconds and omits defaults', () {
-      final start = DateTime.utc(2030, 1, 1);
-      final end = DateTime.utc(2030, 1, 1, 1);
-      final json = LA.progressNative(start, end).toJson();
-      expect(json['start'], start.millisecondsSinceEpoch / 1000.0);
-      expect(json['end'], end.millisecondsSinceEpoch / 1000.0);
-      expect(json.containsKey('style'), isFalse, reason: 'linear is the default');
-      expect(json.containsKey('countsDown'), isFalse, reason: 'true is the default');
-    });
-
-    test('carries every style it was given', () {
-      final start = DateTime.utc(2030, 1, 1);
-      final end = DateTime.utc(2030, 1, 1, 1);
-      final node = LA.progressNative(
-        start,
-        end,
-        style: LAProgressViewNativeStyle.circular,
-        countsDown: false,
-        tint: const Color(0xFF34C759),
-        label: 'Brewing',
-        currentValueLabel: '2 min left',
-        size: 44,
-        height: 8,
-      );
-
-      final json = node.toJson();
-      expect(json['style'], 'circular');
-      expect(json['countsDown'], false);
-      expect(json['tint'], '#34c759');
-      expect(json['label'], 'Brewing');
-      expect(json['currentValueLabel'], '2 min left');
-      expect(json['size'], 44);
-      expect(json['height'], 8);
-
-      expect(LANode.fromJson(json), node);
     });
   });
 

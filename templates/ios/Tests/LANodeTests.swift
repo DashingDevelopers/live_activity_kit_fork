@@ -117,34 +117,6 @@ final class LANodeTests: XCTestCase {
         XCTAssertEqual(countdown.style, .relative)
     }
 
-    func testProgressViewNativeDecodesEpochSecondsAndDefaults() throws {
-        let node = LANode.parse([
-            "type": "progressViewNative",
-            "start": 1_893_450_000.0,
-            "end": 1_893_456_000.0,
-        ])
-        guard case .progressViewNative(let native)? = node else {
-            return XCTFail("expected progressViewNative")
-        }
-        XCTAssertEqual(native.start.timeIntervalSince1970, 1_893_450_000)
-        XCTAssertEqual(native.end.timeIntervalSince1970, 1_893_456_000)
-        XCTAssertEqual(native.style, .linear)
-        XCTAssertTrue(native.countsDown)
-    }
-
-    func testProgressViewNativeSwapsInvertedRange() throws {
-        // start > end must not crash `ProgressView`'s `ClosedRange` init.
-        let node = LANode.parse([
-            "type": "progressViewNative",
-            "start": 1_893_456_000.0,
-            "end": 1_893_450_000.0,
-        ])
-        guard case .progressViewNative(let native)? = node else {
-            return XCTFail("expected progressViewNative")
-        }
-        XCTAssertLessThanOrEqual(native.start, native.end)
-    }
-
     func testInsetsAcceptScalarAndArray() throws {
         let uniform = LAInsets.parse(8.0)
         XCTAssertEqual(uniform?.top, 8)
@@ -211,7 +183,6 @@ final class LANodeTests: XCTestCase {
           {"type":"row","children":[{"type":"spacer"},{"type":"divider"}]},
           {"type":"progress","value":0.5},
           {"type":"circularProgress","value":0.5,"center":{"type":"text","value":"50"}},
-          {"type":"progressViewNative","start":1893450000.0,"end":1893456000.0},
           {"type":"metric","value":"4.2","label":"km","unit":"km","symbol":"figure.run"},
           {"type":"countdown","until":1893456000},
           {"type":"padding","insets":[4,4,4,4],"child":{"type":"text","value":"p"}},
